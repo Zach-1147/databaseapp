@@ -107,7 +107,12 @@ DB_DRIVER=ODBC Driver 17 for SQL Server
  
  
 Open the main folder(DATABASEAPP) in terminal and run the following command:
- 
+
+ #### Windows:
+   ```bash
+   python start_app.py
+   ```
+ #### macOS:
    ```bash
    python3 start_app.py
    ```
