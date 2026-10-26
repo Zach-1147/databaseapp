@@ -29,8 +29,10 @@ def clean_genetic_query(query_df: pd.DataFrame, snp_list: list) -> pd.DataFrame:
     query_df.loc[probable_mask, 'manifest_name'] = (
         query_df.loc[probable_mask, 'possible_rsids'].apply(pick_matching_snp)
     )
-
+    
     query_df = query_df.rename(columns={'manifest_name': 'rsid'})
+    # Keep one row per SNP; 'exact' sorts before 'probable', so exact matches win
+    query_df = query_df.sort_values('match_type').drop_duplicates(subset='rsid', keep='first')
     query_df = query_df.drop(columns=['nucleotides', 'prefix', 'possible_rsids'])
 
     query_df = query_df.set_index('rsid').T
@@ -109,9 +111,9 @@ def calculate_snp_stats(series: pd.Series, rsid: str) -> dict:
         "allele1": f"{allele1} ({freq1:.3f})",
         "allele2": f"{allele2} ({freq2:.3f})",
         "sample_size": sample_size,
-        "hmz_maj": f"{allele1}{allele1} ({hmz_maj:.3f})",
-        "htz": f"{allele1}{allele2} ({htz:.3f})",
-        "hmz_min": f"{allele2}{allele2} ({hmz_min:.3f})",
+        "hmz_maj": f"{major}{major} ({hmz_maj:.3f})",
+        "htz": f"{major}{minor} ({htz:.3f})",
+        "hmz_min": f"{minor}{minor} ({hmz_min:.3f})",
         "maf": round(min(freq1, freq2), 3)
     }
 

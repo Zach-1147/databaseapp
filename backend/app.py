@@ -53,8 +53,6 @@ MODALITY_MAPPING = {
         ]
     },
     
-
-    #assuming this will need this to say type is both here? Zach
     'Genotype Data': {
         'tables': [
             {'name': 'genotype_2025', 'type': 'both', "gender_column": ""},
@@ -1291,7 +1289,7 @@ def query_data():
 
                         '''ZACH
 
-                        NOTE: The function calls below are to generate a table of STATS for each SNP in both children and adults - and would be separate from standard sample size counts as is happening for other modalities for the database web app. For now, these can be dis-regarded and even commented out - however, eventually this would be useful as an additional two tables to print beneath the main sample size table returned.
+                        NOTE: The function calls below are to generate a table of STATS for each SNP in both children and adults - and would be separate from standard sample size counts as is happening for other modalities for the database web app. For now, these can be disregarded and even commented out - however, eventually this would be useful as an additional two tables to print beneath the main sample size table returned.
 
                         '''
 
