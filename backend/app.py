@@ -1287,9 +1287,8 @@ def query_data():
                         sample_query_df, match_types = gPro.clean_genetic_query(df_genetic, snp_list)
 
                         #Step 2. Split adults vs children based on pid string starts
-                        adult_df = sample_query_df[sample_query_df['pid'].str.startswith(('p', 's'))]
-                        child_df = sample_query_df[sample_query_df['pid'].str.startswith(('a', 'b', 'c'))]
-
+                        adult_df = sample_query_df[sample_query_df['pid'].str.startswith(('p', 's'))].reset_index(drop=True)
+                        child_df = sample_query_df[sample_query_df['pid'].str.startswith(('a', 'b', 'c'))].reset_index(drop=True)
                         ### ****--------------------------------------------------------------------
 
                         '''ZACH
