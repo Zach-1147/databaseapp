@@ -32,7 +32,7 @@ MODALITY_MAPPING = {
             {'name': 'asa24_parents_totals_2025', 'type': 'adults', "gender_column": ""}
         ]
     },
-    'Qualtrics Data': {
+    'Survey Data': {
         'tables': [
             {'name': 'qualtrics_children_data_2025', 'type': 'children', "gender_column": "gender"},
             # {'name': 'qualtrics_children_data_2025_coded', 'type': 'child', "gender_column": "gender"},
@@ -47,12 +47,14 @@ MODALITY_MAPPING = {
             {'name': 'parent_demographics_2025', 'type': 'adults', "gender_column": "gender_v2"}
         ]
     },
-    'Life-labs Data': {
+    'Blood Data': {
         'tables': [
             {'name': 'life_labs_2025', 'type': 'both', "gender_column": ""},
         ]
     },
     
+
+    #assuming this will need this to say type is both here? Zach
     'Genotype Data': {
         'tables': [
             {'name': 'genotype_2025', 'type': 'both', "gender_column": ""},
@@ -529,7 +531,7 @@ def build_filter_queries(modality, logic_parameters):
         
         # If no timepoints specified, empty list, or 'all' selected, use all timepoints
         if not timepoints or timepoints == [] or 'all' in timepoints:
-            timepoints = [1, 2, 3, 4, 5, 6, 7, 8, 9]  # All timepoints must be present
+            timepoints = [1, 2, 3, 4, 5, 6]  # All timepoints must be present
         # Otherwise, use the specific timepoints selected
         
         # Make sure timepoints are integers
@@ -936,7 +938,7 @@ def build_filter_pid_query(modality, logic_parameters):
 
         # Timepoints
         if not timepoints or timepoints == [] or 'all' in timepoints:
-            timepoints = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            timepoints = [1, 2, 3, 4, 5, 6]
         timepoint_params = [int(tp) for tp in timepoints]
 
         having_not_null_clause_single = _complete_case_having_sql(
@@ -1102,7 +1104,7 @@ def build_filter_pid_subselect(modality, logic_parameters):
         # Timepoints
         tps = timepoints
         if not tps or tps == [] or 'all' in tps:
-            tps = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+            tps = [1, 2, 3, 4, 5, 6]
         tp_params = [int(tp) for tp in tps]
 
         having_not_null_clause_single = _complete_case_having_sql(
@@ -1231,7 +1233,7 @@ def query_data():
         filter_pid_sets = []  # list of dicts pid->gender per filter
         filter_pid_queries = []
         filter_pid_params = []
-        for filter_item in filters:
+        for filter_index, filter_item in enumerate(filters, start=1):
             modality = filter_item.get('modality')
             logic_parameters = filter_item.get('logicParameters') or []
 
@@ -1239,6 +1241,9 @@ def query_data():
                 continue
 
             else:
+                # Keep every filter result separate, even when the same modality
+                # is selected more than once with different criteria.
+                result_key = f"Filter {filter_index}: {modality}"
                 # Original logic for when there are logic parameters
                 query, params = build_filter_queries(modality, logic_parameters)
                 try:
@@ -1289,7 +1294,7 @@ def query_data():
 
                         '''ZACH
 
-                        NOTE: The function calls below are to generate a table of STATS for each SNP in both children and adults - and would be separate from standard sample size counts as is happening for other modalities for the database web app. For now, these can be disregarded and even commented out - however, eventually this would be useful as an additional two tables to print beneath the main sample size table returned.
+                        NOTE: The function calls below are to generate a table of STATS for each SNP in both children and adults - and would be separate from standard sample size counts as is happening for other modalities for the database web app. For now, these can be dis-regarded and even commented out - however, eventually this would be useful as an additional two tables to print beneath the main sample size table returned.
 
                         '''
 
@@ -1382,14 +1387,14 @@ def query_data():
                                 counts['total'] += 1
                                 counts['gender']['adults'][gnorm] += 1
                             
-                            results[modality] = {
+                            results[result_key] = {
                                 'counts': counts,
                                 'query': query,
                                 'warnings': warnings
                             }
                             continue
                         except Exception as _:
-                            results[modality] = {
+                            results[result_key] = {
                                 'counts': counts,
                                 'query': query,
                                 'warnings': ['Failed to map genders for genotype results.']
@@ -1416,13 +1421,13 @@ def query_data():
                                     counts['gender'][source_type]['O'] = other_count
                     
 
-                    results[modality] = {
+                    results[result_key] = {
                         'counts': counts,
                         'query': query
                     }
 
                 except pyodbc.Error as e:
-                    results[modality] = {
+                    results[result_key] = {
                         'error': str(e),
                         'query': query  # Include failed query for debugging
                     }

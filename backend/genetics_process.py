@@ -31,7 +31,7 @@ def clean_genetic_query(query_df: pd.DataFrame, snp_list: list) -> pd.DataFrame:
     )
     
     query_df = query_df.rename(columns={'manifest_name': 'rsid'})
-    # Keep one row per SNP; 'exact' sorts before 'probable', so exact matches win
+
     query_df = query_df.sort_values('match_type').drop_duplicates(subset='rsid', keep='first')
     query_df = query_df.drop(columns=['nucleotides', 'prefix', 'possible_rsids'])
 
